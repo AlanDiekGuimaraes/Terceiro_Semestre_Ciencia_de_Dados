@@ -1,0 +1,145 @@
+[
+    {
+        "id": "ed819e0ffc2c0db9",
+        "type": "tab",
+        "label": "Fluxo 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "7c27e6afa1acd4d4",
+        "type": "mqtt out",
+        "z": "ed819e0ffc2c0db9",
+        "name": "",
+        "topic": "aula/data_in_motion/temperatura_umidade",
+        "qos": "2",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "1280db66d6816c3c",
+        "x": 450,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "7d890ceda3bbb260",
+        "type": "mqtt in",
+        "z": "ed819e0ffc2c0db9",
+        "name": "",
+        "topic": "aula/data_in_motion/temperatura_umidade",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "1280db66d6816c3c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 440,
+        "wires": [
+            [
+                "ba0889918dca2444"
+            ]
+        ]
+    },
+    {
+        "id": "ba0889918dca2444",
+        "type": "debug",
+        "z": "ed819e0ffc2c0db9",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "53a120ed911794c1",
+        "type": "function",
+        "z": "ed819e0ffc2c0db9",
+        "name": "function 1",
+        "func": "// Função para gerar dados simulados de sensor (temperatura e umidade)\n// Formato de saída: { timestamp: \"\", temperatura: 0, umidade: 0 }\n\n// Configurações iniciais\nvar temperaturaBase = 25;  // Valor base de temperatura em °C\nvar umidadeBase = 60;      // Valor base de umidade em %\nvar variacaoTemp = 5;      // Variação máxima de temperatura\nvar variacaoUmi = 20;      // Variação máxima de umidade\n\n// Gera um valor aleatório dentro de um intervalo\nfunction getRandom(min, max) {\n    return Math.random() * (max - min) + min;\n}\n\n// Gera uma variação suave baseada no timestamp\nfunction getVariation(base, variation, periodMinutes) {\n    const now = new Date();\n    const cycle = Math.sin(now.getMinutes() / periodMinutes * Math.PI * 2);\n    return base + (cycle * variation / 2);\n}\n\n// Gera os dados do sensor\nvar timestamp = new Date().toISOString();\nvar temperatura = getVariation(temperaturaBase, variacaoTemp, 60).toFixed(2);\nvar umidade = getVariation(umidadeBase, variacaoUmi, 90).toFixed(2);\n\n// Adiciona um pouco de ruído aleatório para tornar mais realista\ntemperatura = (parseFloat(temperatura) + getRandom(-0.5, 0.5)).toFixed(2);\numidade = (parseFloat(umidade) + getRandom(-2, 2)).toFixed(2);\n\n// Garante que os valores estão dentro de limites razoáveis\ntemperatura = Math.max(15, Math.min(40, parseFloat(temperatura))).toFixed(2);\numidade = Math.max(30, Math.min(90, parseFloat(umidade))).toFixed(2);\n\n// Cria a mensagem de saída\nmsg.payload = {\n    timestamp: timestamp,\n    temperatura: parseFloat(temperatura),\n    umidade: parseFloat(umidade)\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 140,
+        "y": 280,
+        "wires": [
+            [
+                "7c27e6afa1acd4d4"
+            ]
+        ]
+    },
+    {
+        "id": "6aa2a28e68ff061a",
+        "type": "inject",
+        "z": "ed819e0ffc2c0db9",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 160,
+        "wires": [
+            [
+                "53a120ed911794c1"
+            ]
+        ]
+    },
+    {
+        "id": "1280db66d6816c3c",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "test.mosquitto.org",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]
